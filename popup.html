@@ -8,26 +8,66 @@
         text-align: center;
         padding-top: 10px;
       }
+
       #popup-wrap{
-        
+        width: 400px;
       }
-      #url-list{
+
+      #add-popup{
+        display: none;
+      }
+
+      #timed-list{
         text-decoration: none;
         list-style-type: none;
+        overflow: auto;
+        max-height: 400px;
+      }
+
+      #add-list{
+        display: none;
+        text-decoration: none;
+        list-style-type: none;
+        overflow: auto;
+        max-height: 400px;
+      }
+
+      li{
+        cursor: pointer;
+        margin-bottom: 10px;
+      }
+
+      li:hover{
+        background-color: green;
       }
     </style>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="moment.min.js"></script>
+    <script src="countdown.min.js"></script>
+
   </head>
   <body>
     <script src="popup.js"></script>
-
     <div id="popup-wrap">
       <h3 id="header">Social Media Stopwatch (1.0.0)</h3>
-      <div id="testdiv"></div>
-      <ul id="url-list">
-        
-      </ul>
+      <div id="add-popup">
+        <span id="popup-url"></span>
+        <br>
+        <input type="text" id = "popup-time">
+        <button id="popup-btn">Start</button>
+      </div>
+      <ul id="timed-list"></ul>
+      <h3>Random Break</h3>
+      <button id="add-btn">Add</button>
+      <ul id="add-list"></ul>
     </div>
-    <button id="debutton">Press</button>
+    <button id="timeout">Press</button>
+    <div id="time">Time </div>
+    <div class="now"></div>
+    <div class="then"></div>
+    <div class="duration"></div>
+    <div class="difference"></div>
+    <div class="countdown"></div>
+    <!-- <button id="debutton">Press</button> -->
   </body>
 </html>
