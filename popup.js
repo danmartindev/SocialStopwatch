@@ -5,31 +5,38 @@ $( document ).ready(function() {
   //reference to background page/variable declation
   var bg = chrome.extension.getBackgroundPage();
   var testUrls = bg.urls;
+  var text = bg.blocks;
 
+  //opening port to communicate with background page
+  var port = chrome.runtime.connect({name: "timer"});
 
 
   $( "#timeout" ).click(function(){ 
-
     var now = moment(); // new Date().getTime();  
-    var then = moment().add(39, 'seconds'); // new Date(now + 60 * 1000);
-
-    $(".now").text(moment(now).format('h:mm:ss a'));
-    $(".then").text(moment(then).format('h:mm:ss a'));
-    $(".duration").text(moment(now).to(then));
+    var then = moment().add(1, 'minutes').add(2, 'seconds'); // new Date(now + 60 * 1000);
 
     (function timerLoop() {
-      $(".difference").text(moment().to(then));
+      var differ = moment().to(then);
       $(".countdown").text(countdown(then).toString());
-      requestAnimationFrame(timerLoop);
+      if(countdown(then).toString() != 0){
+        requestAnimationFrame(timerLoop);
+      } else {
+        alert("ZERO");
+      }
     })();
   });
 
-
-  $( "#debutton" ).click(function(){
-    for(var key in testUrls){
-      $('#add-list').append("<li>" + testUrls[key] + "</li>");
-    }  
+  $( "#debutton" ).click(function(){ 
+    port.postMessage({hours: "0", minutes: "0", seconds: "5"});
   });
+
+  $( "#debutton" ).html(text);
+
+  // $( "#debutton" ).click(function(){
+  //   for(var key in testUrls){
+  //     $('#add-list').append("<li>" + testUrls[key] + "</li>");
+  //   }  
+  // });
 
   //last button to add timer, creates timeout var and hides popup
   $( "#popup-btn" ).click(function(){
