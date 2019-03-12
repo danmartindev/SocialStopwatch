@@ -1,7 +1,8 @@
 //dictionary for storing urls with tab id
 var urls = { };
-var timer = { }
-//
+
+//list of timers with name of timer and how much time has passed
+var timers = { }
 
 chrome.runtime.onInstalled.addListener(function() {
     //placeholder for query info to get tabs
@@ -34,30 +35,25 @@ chrome.runtime.onInstalled.addListener(function() {
 });
 
 //listener to grab information on timers from popup
-chrome.runtime.onConnect.addListener(function(port) {
-    console.assert(port.name == "timer");
-    port.onMessage.addListener(function(msg) {
-        console.log("it listened: " + msg.hours + ", " + msg.minutes + ", " + msg.seconds);
-        runTimer(msg.hours, msg.minutes, msg.seconds);
-    });
-});
+// chrome.runtime.onConnect.addListener(function(port) {
+//     console.assert(port.name == "timer");
+//     port.onMessage.addListener(function(msg) {
+//         console.log("it listened: " + msg.hours + ", " + msg.minutes + ", " + msg.seconds);
 
-var pollInterval = 1000; // 1 minute
+//         //getting inital date object to add to
+//         var date = new Date();
+//         //setting date for limit
+//         date.setSeconds(date.getSeconds() + msg.seconds);
+//         date.setMinutes(date.getMinutes() + msg.minutes);
+//         date.setHours(date.getHours() + msg.hours);
 
-function runTimer(h, mm, ss){
-    console.log("timer started");
-    //get time of now + the timer length
-    var endTime = moment().add(h, 'hours').add(mm, 'minutes').add(ss, 'seconds');
+//         //chrome.alarms.create("testAlarm", {when: date1.getTime()});
+//         chrome.alarms.create("testAlarm", {periodInMinutes: 2});
 
-    //function that loops until timer reaches 0
-    var timerInt = setInterval(timerLoop(endTime), 1000);
-    
-}
+//     });
+// });
 
-function timerLoop(then) {
-    console.log("initial then = " + countdown(then).toString());
-    if(countdown(then).toString() == 0){
-        alert("ZERO");
-        console.log("bg timer hit 0");
-    }
-};
+
+// chrome.alarms.onAlarm.addListener(function( alarm ) {
+//     console.log("Got an alarm!", alarm);
+// });

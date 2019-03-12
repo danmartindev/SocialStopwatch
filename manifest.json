@@ -2,10 +2,14 @@
     "name": "Social Media Stopwatch",
     "version": "1.0.0",
     "description": "Timer for how long you spend on Social Media",
-    "permissions": ["tabs", "activeTab", "storage"],
+    "permissions": ["tabs", "activeTab", "storage", "alarms"],
     "options_page": "options.html",
-    "content_security_policy": "script-src 'self' 'unsafe-eval' https://ajax.googleapis.com; object-src 'self']", 
-    
+    "content_scripts": [
+        {
+            "matches": ["https://twitter.com/*"],
+            "js": ["jquery-3.3.1.min.js", "countdown.min.js", "moment.min.js", "timer.js"]
+        }
+    ],
     "background": {
         "scripts": ["background.js", "countdown.min.js", "moment.min.js", "jquery-3.3.1.min.js"],
         "persistent": true
