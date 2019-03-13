@@ -1,0 +1,9 @@
+#socstop-div {
+    position: fixed;
+    top: 95%;
+    left: 95%;
+    background-color: red;
+    /* width: 200px;
+    height: 150px; */
+    font-size: 20px;
+}
