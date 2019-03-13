@@ -1,8 +1,8 @@
 //dictionary for storing urls with tab id
 var urls = { };
 
-//list of timers with name of timer and how much time has passed
-var timers = { }
+//list of all alarms
+var bgAlarms = [];
 
 chrome.runtime.onInstalled.addListener(function() {
     //placeholder for query info to get tabs
@@ -33,3 +33,27 @@ chrome.runtime.onInstalled.addListener(function() {
         delete urls[tabId];   
     });
 });
+
+// var date = new Date();
+// date.setSeconds(date.getSeconds() + 5);
+// chrome.alarms.create("myAlarm", {when: date.getTime()});
+// chrome.alarms.getAll(function(alarms){
+//     alarms.forEach(alarm => {
+//         bgAlarms.push(alarm);
+//     });
+// });
+
+chrome.alarms.onAlarm.addListener(function( alarm ){
+    console.log("Alarm: " + alarm.name);
+});
+
+chrome.runtime.onConnect.addListener(function(port) {
+    console.assert(port.name == "timer");
+    port.onMessage.addListener(function(msg) {
+     
+    });
+});
+
+function createAlarm(){
+    chrome.alarms.create("myAlarm", {when: date.getTime()});
+}
