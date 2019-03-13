@@ -1,75 +1,48 @@
 
-var timeouts = [];
-
 $( document ).ready(function() {
-  //reference to background page/variable declation
+  //reference to background.js/variable declaration
   var bg = chrome.extension.getBackgroundPage();
-  var testUrls = bg.urls;
-  var text = bg.blocks;
+  //get the urls and alarms already in bg
+  var popUrls = bg.urls;
+  var popAlarms = bg.bgAlarms;
 
+  console.log("popup alarms: " + JSON.stringify(popAlarms));
   //opening port to communicate with background page
   var port = chrome.runtime.connect({name: "timer"});
 
-
-  $( "#timeout" ).click(function(){ 
-    var now = moment(); // new Date().getTime();  
-    var then = moment().add(1, 'minutes').add(2, 'seconds'); // new Date(now + 60 * 1000);
-
-    (function timerLoop() {
-      var differ = moment().to(then);
-      $(".countdown").text(countdown(then).toString());
-      if(countdown(then).toString() != 0){
-        requestAnimationFrame(timerLoop);
-      } else {
-        alert("ZERO");
-      }
-    })();
-  });
-
-  $( "#debutton" ).click(function(){ 
-    port.postMessage({hours: "0", minutes: "0", seconds: "5"});
-  });
-
-  $( "#debutton" ).html(text);
-
-  // $( "#debutton" ).click(function(){
-  //   for(var key in testUrls){
-  //     $('#add-list').append("<li>" + testUrls[key] + "</li>");
-  //   }  
-  // });
-
-  //last button to add timer, creates timeout var and hides popup
-  $( "#popup-btn" ).click(function(){
-    $("#timed-list").append( $(this).siblings('#popup-url'));
-    
-    timeouts.push();
+  //creates the alarm then hides the add popup
+  $( "#newalarm-btn" ).click(function(){
+    port.postMessage({name: "", hours: "0", minutes: "0", seconds: "5"});
     $(this).parent().toggle();
   });
 
-  
-
-  //button to open url list for adding a timer
+  //button to open url list for adding an alarm
   $( "#add-btn" ).click(function(){
-    if($('#add-list').is(":hidden")){
-      for(var key in testUrls){
-        $('#add-list').append("<li class='add-li'>" + urlTrunc(testUrls[key]) + "</li>");
+    if($('#url-list').is(":hidden")){
+      for(var key in popUrls){
+        //creates a list of urls for the user to choose from, 
+        //tab id(key) is stored in id property for use in alarm creation 
+        $('#url-list').append("<li class='add-li' id = 'key'>" + urlTrunc(popUrls[key]) + "</li>");
       }  
     } 
-    $('#add-list').toggle();
+    $('#url-list').toggle();
   });
 
   //listener for urls in the add timer section
-  $( "#add-list" ).on( "click", ".add-li",function() {
-    showPopup($( this ).text());
+  $( "#url-list" ).on( "click", ".add-li",function() {
+    //shows the add timer popup with the url of the desired site
+    showPopup($( this ).text(), $(this).attr('id'));
+    //removes the url from list of urls 
     $(this).remove();
   });
 
 });
 
 //function called to pass info to popup and show popup
-function showPopup(url){
-  $( "#add-popup" ).toggle();
-  $( "#popup-url" ).html(url);
+function showPopup(url, id){
+  $( "newalarm-div" ).toggle();
+  $( "#newalarm-url" ).html(url);
+  $( "#input-id" ).value(id);
 }
 
 //function to truncate url length
@@ -82,3 +55,10 @@ urlTrunc = function(url) {
   }
 };
 
+
+
+  // window.setInterval( function(){
+  //   $( "#alarm-list" ).text(popAlarms[0].scheduledTime - new Date().getTime());
+  // },100)
+
+  //$( "#alarm-list" ).text(popAlarms[0].scheduledTime - new Date().getTime());
