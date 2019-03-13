@@ -13,18 +13,19 @@
         width: 400px;
       }
 
-      #add-popup{
+      #newalarm-div{
         display: none;
+        background-color: lightgray;
       }
 
-      #timed-list{
+      #alarm-list{
         text-decoration: none;
         list-style-type: none;
         overflow: auto;
         max-height: 400px;
       }
 
-      #add-list{
+      #url-list{
         display: none;
         text-decoration: none;
         list-style-type: none;
@@ -40,6 +41,10 @@
       li:hover{
         background-color: green;
       }
+
+      input{
+        width: 50px;
+      }
     </style>
     <script src="jquery-3.3.1.min.js"></script>
     <script src="moment.min.js"></script>
@@ -49,21 +54,23 @@
     <script src="popup.js"></script>
     <div id="popup-wrap">
       <h3 id="header">Social Media Stopwatch (1.0.0)</h3>
-      <div id="add-popup">
-        <span id="popup-url"></span>
+      <!-- list of current alarms -->
+      <div id="alarm-list">Alarm list</div>
+      <!-- popup for creating a new alarm -->
+      <div id="newalarm-div">
+        <span id="newalarm-url"></span>
         <br>
-        <input type="text" id = "popup-time">
-        <button id="popup-btn">Start</button>
+        <form>
+          <span><input type="text" id = "input-h"> H</span>
+          <span><input type="text" id = "input-m"> M</span>
+          <span><input type="text" id = "input-s"> S</span>
+          <input type="hidden" id="input-id" name="custId" value="">
+        </form>
+        <button id="newalarm-btn">Start</button>
       </div>
-      <ul id="timed-list"></ul>
-      <h3>Random Break</h3>
+      <!-- button to open dropdown which shows a list of urls for alarms -->
       <button id="add-btn">Add</button>
-      <ul id="add-list"></ul>
+      <ul id="url-list"></ul>
     </div>
-    <button id="timeout">Press</button>
-    <div id="time">Time </div>
-    <div class="duration"></div>
-    <div class="countdown"></div>
-    <button id="debutton">deb</button>
   </body>
 </html>
