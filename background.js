@@ -33,27 +33,3 @@ chrome.runtime.onInstalled.addListener(function() {
         delete urls[tabId];   
     });
 });
-
-//listener to grab information on timers from popup
-// chrome.runtime.onConnect.addListener(function(port) {
-//     console.assert(port.name == "timer");
-//     port.onMessage.addListener(function(msg) {
-//         console.log("it listened: " + msg.hours + ", " + msg.minutes + ", " + msg.seconds);
-
-//         //getting inital date object to add to
-//         var date = new Date();
-//         //setting date for limit
-//         date.setSeconds(date.getSeconds() + msg.seconds);
-//         date.setMinutes(date.getMinutes() + msg.minutes);
-//         date.setHours(date.getHours() + msg.hours);
-
-//         //chrome.alarms.create("testAlarm", {when: date1.getTime()});
-//         chrome.alarms.create("testAlarm", {periodInMinutes: 2});
-
-//     });
-// });
-
-
-// chrome.alarms.onAlarm.addListener(function( alarm ) {
-//     console.log("Got an alarm!", alarm);
-// });
