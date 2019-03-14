@@ -34,26 +34,32 @@ chrome.runtime.onInstalled.addListener(function() {
     });
 });
 
-// var date = new Date();
-// date.setSeconds(date.getSeconds() + 5);
-// chrome.alarms.create("myAlarm", {when: date.getTime()});
-// chrome.alarms.getAll(function(alarms){
-//     alarms.forEach(alarm => {
-//         bgAlarms.push(alarm);
-//     });
-// });
-
+//function for alarm trigger
 chrome.alarms.onAlarm.addListener(function( alarm ){
     console.log("Alarm: " + alarm.name);
 });
 
+//connecting port for communication with popup
 chrome.runtime.onConnect.addListener(function(port) {
-    console.assert(port.name == "timer");
+    console.assert(port.name == "timer"); //alert for port name
     port.onMessage.addListener(function(msg) {
-     
+        console.log("H:" + msg.hours + " M:" + msg.minutes + " S:" + msg.seconds + " ID:" + msg.id);
+        createAlarm(msg.hours, msg.minutes, msg.seconds, msg.id);
+        port.postMessage("message from background");
     });
 });
 
-function createAlarm(){
-    chrome.alarms.create("myAlarm", {when: date.getTime()});
+function createAlarm(h, mm, ss, id){
+    var date = new Date(); //create date object 
+    //add the set time to date time
+    date.setHours(date.getHours() + parseInt(h));
+    date.setMinutes(date.getMinutes() + parseInt(mm));
+    date.setSeconds(date.getSeconds() + parseInt(ss));
+    console.log("date time: " + date.getTime());
+    //create the alarm with the name and time
+    chrome.alarms.create(id, {when: date.getTime()});
+    //get the alarm and add it to the array
+    chrome.alarms.get(id, function(alarm){
+        bgAlarms.push(alarm);
+    });
 }
