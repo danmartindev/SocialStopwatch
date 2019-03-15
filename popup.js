@@ -9,17 +9,16 @@ $( document ).ready(function() {
   //reference to background.js/variable declaration
   bg = chrome.extension.getBackgroundPage();
   //get the urls and alarms already in bg
-  popUrls = bg.urls;
   popAlarms = bg.bgAlarms;
+  popUrls = bg.urls;
 
   console.log("popup alarms: " + JSON.stringify(popAlarms));
 
-  
   //port responses
   port.onMessage.addListener(function(msg) {
-    console.log("bg " + bg.bgAlarms);
+    //console.log("bg " + bg.bgAlarms);
     //popAlarms = bg.bgAlarms;
-    console.log("pop " + popAlarms);
+    //console.log("pop " + popAlarms);
     updateAlarmList();
     //$( "#alarm-list" ).text(popAlarms[0].scheduledTime - new Date().getTime());
   });
@@ -32,6 +31,7 @@ $( document ).ready(function() {
   //button to open url list for adding an alarm
   $( "#add-btn" ).click(function(){
     if($('#url-list').is(":hidden")){
+      //popUrls = bg.urls; //re-populate list of urls
       for(var key in popUrls){
         //creates a list of urls for the user to choose from, 
         //tab id(key) is stored in id property for use in alarm creation 
@@ -52,10 +52,22 @@ $( document ).ready(function() {
   //code to submit form for new alarm
   $( "form" ).submit(function(event){
     var fields = $( this ).serializeArray(); //serialize values into an array
-    port.postMessage({hours: fields[0].value, minutes: fields[1].value, seconds: fields[2].value, id: fields[3].value}); //post message to background page with alarm info
-    //console.log( $( this ).serializeArray() ); //log the serialized array of values
-    event.preventDefault(); //prevents submission if something is wrong
-    $( "#newalarm-div" ).toggle(); //hide the div
+    var hasNan = false;
+    //checks values for NaN
+    fields.forEach(field => {
+      if(isNaN(parseInt(field.value))){
+        hasNan = true;
+      }
+    });
+    
+    if(!hasNan){
+      port.postMessage({func: "create", hours: fields[0].value, minutes: fields[1].value, seconds: fields[2].value, id: fields[3].value}); //post message to background page with alarm info
+      //console.log( $( this ).serializeArray() ); //log the serialized array of values
+      event.preventDefault(); //prevents submission if something is wrong
+      $( "#newalarm-div" ).toggle(); //hide the div
+    } else {
+      alert("Please enter a valid number value for the timer");
+    }
     $( this ).trigger("reset"); //reset the form values
   });
 });
@@ -77,17 +89,20 @@ urlTrunc = function(url) {
   }
 };
 
+
+//////optimize for adding new li, dont delete and recreate!!
 function updateAlarmList(){
+  //variables for updates
   var diff;
   var hours;
   var minutes;
   var seconds;
   var now = new Date().getTime();
-  console.log("updating alarms");
+  //empty list before refreshing
+  $( "#alarm-list" ).empty();
+
   popAlarms.forEach(alarm => {
     diff = alarm.scheduledTime - now;
-    console.log("st: " + alarm.scheduledTime);
-    console.log("dt: " + new Date().getTime());
     hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
     minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
     seconds = Math.floor((diff % (1000 * 60)) / 1000);
@@ -95,6 +110,11 @@ function updateAlarmList(){
   });
 }
 
+window.setInterval( function(){
+  if(popAlarms.length > 0){
+    updateAlarmList();
+  }
+},1000)
 
 
   // window.setInterval( function(){
