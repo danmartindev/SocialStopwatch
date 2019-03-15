@@ -37,15 +37,22 @@ chrome.runtime.onInstalled.addListener(function() {
 //function for alarm trigger
 chrome.alarms.onAlarm.addListener(function( alarm ){
     console.log("Alarm: " + alarm.name);
+    alert("Times Up!");
 });
 
 //connecting port for communication with popup
 chrome.runtime.onConnect.addListener(function(port) {
     console.assert(port.name == "timer"); //alert for port name
     port.onMessage.addListener(function(msg) {
-        console.log("H:" + msg.hours + " M:" + msg.minutes + " S:" + msg.seconds + " ID:" + msg.id);
-        createAlarm(msg.hours, msg.minutes, msg.seconds, msg.id);
-        port.postMessage("message from background");
+        switch(msg.func){
+            case "create":
+                createAlarm(msg.hours, msg.minutes, msg.seconds, msg.id);
+                port.postMessage("message from background");
+                break;
+            case "delete":
+                console.log("delete");
+                break;
+        }
     });
 });
 
