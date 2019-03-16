@@ -10,7 +10,10 @@ $( document ).ready(function() {
   bg = chrome.extension.getBackgroundPage();
   //get the urls and alarms already in bg
   popAlarms = bg.bgAlarms;
+  pausedAlarms = bg.paused;
   popUrls = bg.urls;
+
+  updateAlarmList();
 
   console.log("popup alarms: " + JSON.stringify(popAlarms));
 
@@ -53,9 +56,13 @@ $( document ).ready(function() {
   $( "form" ).submit(function(event){
     var fields = $( this ).serializeArray(); //serialize values into an array
     var hasNan = false;
-    //checks values for NaN
     fields.forEach(field => {
-      if(isNaN(parseInt(field.value))){
+      //sets value to 0 for emty input
+      if(field.value == ""){
+        field.value = 0;
+      }
+      //checks values for NaN
+      else if(isNaN(parseInt(field.value))){
         hasNan = true;
       }
     });
@@ -69,6 +76,28 @@ $( document ).ready(function() {
       alert("Please enter a valid number value for the timer");
     }
     $( this ).trigger("reset"); //reset the form values
+  });
+
+  //listener for pause btns in alarm list
+  $( "#alarm-list" ).on( "click", ".pause-btn",function() {
+    console.log("clicked pause");
+    var alarmName = $(this).parent().attr('id');  
+    popAlarms.forEach(alarm => {
+      if(alarm.name == alarmName){
+        pauseAlarm(alarm);
+      }
+    });
+    // $(this).toggleClass("pause-btn");
+    // $(this).toggleClass("resume-btn");
+  });
+
+  //listener for pause btns in alarm list
+  $( "#alarm-list" ).on( "click", ".resume-btn",function() {
+    console.log("clicked resume");
+    var alarmName = $(this).parent().attr('id');  
+    resumeAlarm(alarmName);
+    // $(this).toggleClass("pause-btn");
+    // $(this).toggleClass("resume-btn");
   });
 });
 
@@ -89,6 +118,17 @@ urlTrunc = function(url) {
   }
 };
 
+//manually pause alarm
+function pauseAlarm(alarm){
+  var now = new Date().getTime();
+  var diff = alarm.scheduledTime - now;
+  port.postMessage({func: "pause", name: alarm.name, addTime: diff}); //post message to pause specific alarm
+}
+
+//manually resume alarm
+function resumeAlarm(alarm){
+  port.postMessage({func: "resume", name: alarm});
+}
 
 //////optimize for adding new li, dont delete and recreate!!
 function updateAlarmList(){
@@ -106,8 +146,12 @@ function updateAlarmList(){
     hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
     minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
     seconds = Math.floor((diff % (1000 * 60)) / 1000);
-    $( "#alarm-list" ).append("<li>" + hours + "h, " + minutes + "m, " + seconds + "s</li>");
+    $( "#alarm-list" ).append("<li id='" + alarm.name + "'>" + hours + "h, " + minutes + "m, " + seconds + "s <button class='pause-btn'>Pa</button></li>");
   });
+
+  for(var key in pausedAlarms){
+    $( "#alarm-list" ).append("<li id='" + key + "'>"+ urlTrunc(popUrls[key]) +"<button class='resume-btn'>Re</button></li>");
+  }
 }
 
 window.setInterval( function(){
