@@ -3,6 +3,10 @@
   <head>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <style>
+      body{
+        padding: 15px;
+      }
+
       #header{
         font-size: 18px;
         text-align: center;
@@ -46,6 +50,7 @@
         width: 50px;
       }
     </style>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
     <script src="jquery-3.3.1.min.js"></script>
     <script src="moment.min.js"></script>
     <script src="countdown.min.js"></script>
@@ -55,21 +60,23 @@
     <div id="popup-wrap">
       <h3 id="header">Social Media Stopwatch (1.0.0)</h3>
       <!-- list of current alarms -->
-      <div id="alarm-list">Alarm list</div>
+      <h4>Alarms</h4>
+      <div id="alarm-list"></div>
       <!-- popup for creating a new alarm -->
       <div id="newalarm-div">
         <span id="newalarm-url"></span>
         <br>
         <form>
-          <span><input type="text" id="input-h" name="input-h"> H</span>
-          <span><input type="text" id="input-m" name="input-m"> M</span>
-          <span><input type="text" id="input-s" name="input-s"> S</span>
+          <span><input type="text" id="input-h" name="input-h">H</span>
+          <span><input type="text" id="input-m" name="input-m">M</span>
+          <span><input type="text" id="input-s" name="input-s">S</span>
           <input type="hidden" id="input-id" name="input-id">
           <input type="submit" name="newalarm-submit" value="submit">
         </form>
       </div>
       <!-- button to open dropdown which shows a list of urls for alarms -->
-      <button id="add-btn">Add</button>
+      <!-- <button id="add-btn"><i class = "fas fa-plus"></i></button> -->
+      <i class="fas fa-plus"  id="add-btn"></i>
       <ul id="url-list"></ul>
     </div>
   </body>
