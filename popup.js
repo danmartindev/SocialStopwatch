@@ -1,3 +1,10 @@
+/* popup.js created for Social Media Stopwatch
+* Updated 3/17/2019
+* Author: Daniel Martin
+* website: www.dmartin.me
+* Github: github.com/danmartindev
+*/
+
 var bg;
 var popUrls;
 var popAlarms;
@@ -6,6 +13,8 @@ var popAlarms;
 var port = chrome.runtime.connect({name: "timer"});
 
 $( document ).ready(function() {
+  //initial post message to load urls in bg
+  port.postMessage({func: "init"});
   //reference to background.js/variable declaration
   bg = chrome.extension.getBackgroundPage();
   //get the urls and alarms already in bg
@@ -13,7 +22,7 @@ $( document ).ready(function() {
   pausedAlarms = bg.paused;
   popUrls = bg.urls;
 
-  updateAlarmList();
+  updateAlarmList(); //update list, otherwise will wait for first load
 
   console.log("popup alarms: " + JSON.stringify(popAlarms));
 
@@ -35,12 +44,22 @@ $( document ).ready(function() {
   $( "#add-btn" ).click(function(){
     if($('#url-list').is(":hidden")){
       //popUrls = bg.urls; //re-populate list of urls
+      //creates a list of urls for the user to choose from, 
       for(var key in popUrls){
-        //creates a list of urls for the user to choose from, 
         //tab id(key) is stored in id property for use in alarm creation 
-        $('#url-list').append("<li class='add-li' id = " + key + ">" + urlTrunc(popUrls[key]) + "</li>");
+        if($("#" + key).length) {
+          //child exists
+          console.log("update url: " + key);
+          $('#url-list').children("#" + key).text(urlTrunc(popUrls[key]));
+        } else {
+          //create new element if new tab
+          console.log("create url: " + key);
+          $('#url-list').append("<li class='add-li' id = " + key + ">" + urlTrunc(popUrls[key]) + "</li>");
+        }
       }  
     } 
+    $(this).toggleClass("fa-plus");
+    $(this).toggleClass("fa-minus");
     $('#url-list').toggle();
   });
 
@@ -146,11 +165,11 @@ function updateAlarmList(){
     hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
     minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
     seconds = Math.floor((diff % (1000 * 60)) / 1000);
-    $( "#alarm-list" ).append("<li id='" + alarm.name + "'>" + hours + "h, " + minutes + "m, " + seconds + "s <button class='pause-btn'>Pa</button></li>");
+    $( "#alarm-list" ).append("<li id='" + alarm.name + "'>" + urlTrunc(popUrls[alarm.name]) + "  "+ hours + "h, " + minutes + "m, " + seconds + "s <i class='pause-btn fas fa-pause-circle fa-lg'></i></li>");
   });
 
   for(var key in pausedAlarms){
-    $( "#alarm-list" ).append("<li id='" + key + "'>"+ urlTrunc(popUrls[key]) +"<button class='resume-btn'>Re</button></li>");
+    $( "#alarm-list" ).append("<li id='" + key + "'>"+ urlTrunc(popUrls[key]) +"<i class='resume-btn fas fa-play-circle fa-lg'></i></li>");
   }
 }
 
