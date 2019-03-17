@@ -1,49 +1,58 @@
-//dictionary for storing urls with tab id
-var urls = { };
+/* background.js created for Social Media Stopwatch
+* Updated 3/17/2019
+* Author: Daniel Martin
+* website: www.dmartin.me
+* Github: github.com/danmartindev
+*/
 
-//dictionary of all alarms
-var bgAlarms = [];
-//dictionary of paused alarms
-var paused = { };
+var urls = { }; //dictionary for storing urls with tab id
+var bgAlarms = []; //dictionary of all alarms
+var paused = { }; //dictionary of paused alarms
+
+var queryInfo = { }; //placeholder for query info to get tabs
+
 
 chrome.runtime.onInstalled.addListener(function() {
-    //placeholder for query info to get tabs
-    var queryInfo = { };
     //clear all previous built up alarms
     chrome.alarms.clearAll();
 
-    //grab tabs already opened
+    //update url for tab changed
+    // chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
+    //     //only fires when the change is complete
+    //     if(changeInfo.status == "complete"){
+    //         urls[tabId] = tab.url;
+    //     }
+    // });
+
+    //update urls for newly created tabs
+    // chrome.tabs.onCreated.addListener(function(tab) {    
+    //     urls[tab.id] = tab.url;
+    // });
+
+    //remove deleted tabs from urls
+    // chrome.tabs.onRemoved.addListener(function(tabId) { 
+    //     delete urls[tabId];   
+    // });
+});
+
+//grabs tabs each time the popup is opened
+function initTabs(){
+    //grab open tabs
     chrome.tabs.query(queryInfo, function (tabs) {
         tabs.forEach(tab => {
             urls[tab.id] = tab.url;
         });
     });
-
-    //update url for tab changed
-    chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
-        //only fires when the change is complete
-        if(changeInfo.status == "complete"){
-            urls[tabId] = tab.url;
-        }
-    });
-
-    //update urls for newly created tabs
-    chrome.tabs.onCreated.addListener(function(tab) {    
-        urls[tab.id] = tab.url;
-    });
-
-    //remove deleted tabs from urls
-    chrome.tabs.onRemoved.addListener(function(tabId) { 
-        delete urls[tabId];   
-    });
-});
-
+}
 
 //connecting port for communication with popup
 chrome.runtime.onConnect.addListener(function(port) {
     console.assert(port.name == "timer"); //alert for port name
     port.onMessage.addListener(function(msg) {
         switch(msg.func){
+            case "init":
+                initTabs();
+                break;
             case "create":
                 createAlarm(msg.hours, msg.minutes, msg.seconds, msg.id);
                 port.postMessage("message from background");
