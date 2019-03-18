@@ -24,43 +24,33 @@ $( document ).ready(function() {
 
   updateAlarmList(); //update list, otherwise will wait for first load
 
-  console.log("popup alarms: " + JSON.stringify(popAlarms));
-
   //port responses
   port.onMessage.addListener(function(msg) {
-    //console.log("bg " + bg.bgAlarms);
-    //popAlarms = bg.bgAlarms;
-    //console.log("pop " + popAlarms);
+    //calls alarm list to reduce time lag?????????????????????
     updateAlarmList();
-    //$( "#alarm-list" ).text(popAlarms[0].scheduledTime - new Date().getTime());
   });
 
-  //creates the alarm then hides the add popup
+  //creates the alarm from inputs then hides the add popup
   $( "#newalarm-btn" ).click(function(){
     $(this).parent().toggle();
   });
 
   //button to open url list for adding an alarm
-  $( "#add-btn" ).click(function(){
+  $( "#url-header" ).click(function(){
     if($('#url-list').is(":hidden")){
       //popUrls = bg.urls; //re-populate list of urls
       //creates a list of urls for the user to choose from, 
       for(var key in popUrls){
         //tab id(key) is stored in id property for use in alarm creation 
         if($("#" + key).length) {
-          //child exists
-          console.log("update url: " + key);
           $('#url-list').children("#" + key).text(urlTrunc(popUrls[key]));
         } else {
-          //create new element if new tab
-          console.log("create url: " + key);
           $('#url-list').append("<li class='add-li' id = " + key + ">" + urlTrunc(popUrls[key]) + "</li>");
         }
       }  
     } 
-    $(this).toggleClass("fa-plus");
-    $(this).toggleClass("fa-minus");
-    $('#url-list').toggle();
+    $(this).children().toggleClass("fa-minus fa-plus");
+    $('.url-info').slideToggle(500);
   });
 
   //listener for urls in the add timer section
@@ -90,7 +80,7 @@ $( document ).ready(function() {
       port.postMessage({func: "create", hours: fields[0].value, minutes: fields[1].value, seconds: fields[2].value, id: fields[3].value}); //post message to background page with alarm info
       //console.log( $( this ).serializeArray() ); //log the serialized array of values
       event.preventDefault(); //prevents submission if something is wrong
-      $( "#newalarm-div" ).toggle(); //hide the div
+      $( "#newalarm-div" ).slideToggle(400); //hide the div
     } else {
       alert("Please enter a valid number value for the timer");
     }
@@ -106,8 +96,9 @@ $( document ).ready(function() {
         pauseAlarm(alarm);
       }
     });
-    // $(this).toggleClass("pause-btn");
-    // $(this).toggleClass("resume-btn");
+    $("#alarm-list").remove($(this).parent().attr('id'));
+    $(this).toggleClass("pause-btn resume-btn");
+    $(this).toggleClass("fa-pause-circle fa-play-circle");
   });
 
   //listener for pause btns in alarm list
@@ -115,14 +106,14 @@ $( document ).ready(function() {
     console.log("clicked resume");
     var alarmName = $(this).parent().attr('id');  
     resumeAlarm(alarmName);
-    // $(this).toggleClass("pause-btn");
-    // $(this).toggleClass("resume-btn");
+    $(this).toggleClass("pause-btn resume-btn");
+    $(this).toggleClass("fa-pause-circle fa-play-circle");
   });
 });
 
 //function called to pass info to popup and show popup
 function showPopup(url, id){
-  $( "#newalarm-div" ).toggle();
+  $( "#newalarm-div" ).slideToggle(400);
   $( "#newalarm-url" ).html(url);
   $( "#input-id" ).val(id);
 }
@@ -149,39 +140,43 @@ function resumeAlarm(alarm){
   port.postMessage({func: "resume", name: alarm});
 }
 
-//////optimize for adding new li, dont delete and recreate!!
 function updateAlarmList(){
-  //variables for updates
-  var diff;
-  var hours;
-  var minutes;
-  var seconds;
-  var now = new Date().getTime();
-  //empty list before refreshing
-  $( "#alarm-list" ).empty();
-
-  popAlarms.forEach(alarm => {
-    diff = alarm.scheduledTime - now;
-    hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-    seconds = Math.floor((diff % (1000 * 60)) / 1000);
-    $( "#alarm-list" ).append("<li id='" + alarm.name + "'>" + urlTrunc(popUrls[alarm.name]) + "  "+ hours + "h, " + minutes + "m, " + seconds + "s <i class='pause-btn fas fa-pause-circle fa-lg'></i></li>");
-  });
-
-  for(var key in pausedAlarms){
-    $( "#alarm-list" ).append("<li id='" + key + "'>"+ urlTrunc(popUrls[key]) +"<i class='resume-btn fas fa-play-circle fa-lg'></i></li>");
-  }
+  updateActiveAlarms(); //active alarms updating
+  updatePausedAlarms(); //paused alarms updating
 }
 
+function updateActiveAlarms(){
+   //variables for updates
+   var diff;
+   var hours;
+   var minutes;
+   var seconds;
+   var now = new Date().getTime();
+ 
+   popAlarms.forEach(alarm => {
+     //calculating time for each alarm
+     diff = alarm.scheduledTime - now;
+     hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+     minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+     seconds = Math.floor((diff % (1000 * 60)) / 1000);
+     //update time info, or create new element for new alarm
+     if($("#" + alarm.name).length) {
+       $('#alarm-list').children("#" + alarm.name).children("span").text( urlTrunc(popUrls[alarm.name]) + "  "+ hours + "h, " + minutes + "m, " + seconds);
+     } else {
+       $( "#alarm-list" ).append("<li id='" + alarm.name + "'><span>" + urlTrunc(popUrls[alarm.name]) + "  "+ hours + "h, " + minutes + "m, " + seconds + "s</span><i class='pause-btn fas fa-pause-circle fa-lg'></i></li>");
+     }
+   });
+}
+
+function updatePausedAlarms(){
+  for(var key in pausedAlarms){
+      $('#alarm-list').children("#" + key).children("span").text(urlTrunc(popUrls[key])); //updating paused alarm info
+  } 
+}
+
+//interval timer for displaying time left in alarm
 window.setInterval( function(){
   if(popAlarms.length > 0){
     updateAlarmList();
   }
 },1000)
-
-
-  // window.setInterval( function(){
-  //   $( "#alarm-list" ).text(popAlarms[0].scheduledTime - new Date().getTime());
-  // },100)
-
-  //$( "#alarm-list" ).text(popAlarms[0].scheduledTime - new Date().getTime());
