@@ -19,31 +19,54 @@
 
       #newalarm-div{
         display: none;
-        background-color: lightgray;
       }
 
       #alarm-list{
         text-decoration: none;
         list-style-type: none;
-        overflow: auto;
         max-height: 400px;
       }
 
-      #url-list{
+      #url-header{
+        font-size: 20px;
+        font-weight: 500;
+        cursor: pointer;
+        /* display: inline-block; */
+      }
+
+      #add-btn{
+        font-size: 16px;
+      }
+
+      .url-info{
         display: none;
+      }
+
+      #url-list{
         text-decoration: none;
         list-style-type: none;
         overflow: auto;
         max-height: 400px;
       }
 
-      li{
+      .add-li{
+        display: inline-block;
+        padding: 5px;
+        border-radius: 3px;
+        margin-right: 20px;
         cursor: pointer;
         margin-bottom: 10px;
+        -webkit-transition: background-color .5s; /* For Safari 3.1 to 6.0 */
+        transition: background-color  .25s;
+        transition-timing-function: ease-in-out;
       }
 
-      li:hover{
-        background-color: green;
+      .add-li:hover{
+        background-color: lightgray;
+      }
+
+      i{
+        cursor: pointer;
       }
 
       input{
@@ -52,8 +75,6 @@
     </style>
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
     <script src="jquery-3.3.1.min.js"></script>
-    <script src="moment.min.js"></script>
-    <script src="countdown.min.js"></script>
   </head>
   <body>
     <script src="popup.js"></script>
@@ -76,8 +97,8 @@
       </div>
       <!-- button to open dropdown which shows a list of urls for alarms -->
       <!-- <button id="add-btn"><i class = "fas fa-plus"></i></button> -->
-      <i class="fas fa-plus"  id="add-btn"></i>
-      <ul id="url-list"></ul>
+      <span id="url-header">Add Alarm  <i class="fas fa-plus" id="add-btn"></i></span>
+      <ul id="url-list" class="url-info"></ul>
     </div>
   </body>
 </html>
