@@ -36,7 +36,7 @@ $( document ).ready(function() {
   });
 
   //button to open url list for adding an alarm
-  $( "#url-header" ).click(function(){
+  $( "#add-btn" ).click(function(){
     if($('#url-list').is(":hidden")){
       //popUrls = bg.urls; //re-populate list of urls
       //creates a list of urls for the user to choose from, 
@@ -49,8 +49,8 @@ $( document ).ready(function() {
         }
       }  
     } 
-    $(this).children().toggleClass("fa-minus fa-plus");
-    $('.url-info').slideToggle(500);
+    $(this).toggleClass("fa-minus fa-plus");
+    $('#url-list').slideToggle(500);
   });
 
   //listener for urls in the add timer section
@@ -98,7 +98,7 @@ $( document ).ready(function() {
     });
     $("#alarm-list").remove($(this).parent().attr('id'));
     $(this).toggleClass("pause-btn resume-btn");
-    $(this).toggleClass("fa-pause-circle fa-play-circle");
+    $(this).toggleClass("fa-pause fa-play");
   });
 
   //listener for pause btns in alarm list
@@ -107,7 +107,7 @@ $( document ).ready(function() {
     var alarmName = $(this).parent().attr('id');  
     resumeAlarm(alarmName);
     $(this).toggleClass("pause-btn resume-btn");
-    $(this).toggleClass("fa-pause-circle fa-play-circle");
+    $(this).toggleClass("fa-pause fa-play");
   });
 });
 
@@ -120,7 +120,7 @@ function showPopup(url, id){
 
 //function to truncate url length
 urlTrunc = function(url) {
-  var limit = 35;
+  var limit = 30;
   if(url.length > limit){
     return url.substring(0, limit) + '...';
   } else {
@@ -163,7 +163,7 @@ function updateActiveAlarms(){
      if($("#" + alarm.name).length) {
        $('#alarm-list').children("#" + alarm.name).children("span").text( urlTrunc(popUrls[alarm.name]) + "  "+ hours + "h, " + minutes + "m, " + seconds);
      } else {
-       $( "#alarm-list" ).append("<li id='" + alarm.name + "'><span>" + urlTrunc(popUrls[alarm.name]) + "  "+ hours + "h, " + minutes + "m, " + seconds + "s</span><i class='pause-btn fas fa-pause-circle fa-lg'></i></li>");
+       $( "#alarm-list" ).append("<li id='" + alarm.name + "'><span>" + urlTrunc(popUrls[alarm.name]) + "  "+ hours + "h, " + minutes + "m, " + seconds + "s</span><i class='pause-btn fas fa-pause fa-lg'></i></li>");
      }
    });
 }
