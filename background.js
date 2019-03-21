@@ -8,7 +8,7 @@
 var urls = { }; //dictionary for storing urls with tab id
 var bgAlarms = []; //array of all alarms
 var paused = { }; //dictionary of paused alarms
-var defaultAlarms = { }; 
+var defaultAlarms = { }; //dictionary of alarms created on url creation
 
 var queryInfo = { }; //placeholder for query info to get tabs
 
@@ -32,13 +32,17 @@ chrome.runtime.onInstalled.addListener(function() {
     //update urls for newly created tabs
     chrome.tabs.onCreated.addListener(function(tab) {    
         urls[tab.id] = tab.url;
-        console.log("tab created");
     });
 
     //remove deleted tabs from urls
     chrome.tabs.onRemoved.addListener(function(tabId) { 
-        console.log("tab deleted");
-        delete urls[tabId];   
+        //delete alarms that match tab when tab is closed
+        bgAlarms.forEach(alarm => {
+            if(alarm.name == tabId){
+                deleteAlarm(alarm);
+            }
+        });
+        delete urls[tabId]; //remove from urls list   
     });
 
     //get the default alarm urls/times from local storage
@@ -105,10 +109,6 @@ chrome.storage.onChanged.addListener(function(changes, sync){
 });
 
 function compareURLs(id){
-    //console.log("alarms::" + JSON.stringify(bgAlarms));
-    //console.log("url: " + urls[url]);
-    //console.log("URLS: " + JSON.stringify(urls));
-
     //check if alarm already exists
     var exists = false;
     for(var i = 0; i < bgAlarms.length; i++){
@@ -140,23 +140,19 @@ function resumeAlarm(name){
 
 function createAlarm(h, mm, ss, id){
     var date = new Date(); //create date object 
-    console.log("initial time: " + date.getTime());
-
     //add the set time to date time
     date.setHours(date.getHours() + parseInt(h));
     date.setMinutes(date.getMinutes() + parseInt(mm));
     date.setSeconds(date.getSeconds() + parseInt(ss));
-    console.log("date time: " + date.getTime());
-    //create the alarm with the name and time
-    console.log(id);
-    chrome.alarms.create(id, {when: date.getTime()});
-    //get the alarm and add it to the array
+
+    chrome.alarms.create(id, {when: date.getTime()}); //create the alarm with the name and time
     chrome.alarms.get(id, function(alarm){
-        bgAlarms.push(alarm);
+        bgAlarms.push(alarm); //get the alarm and add it to the array
     });
 }
 
 function deleteAlarm(al){
+    console.log("al: " + al);
     var index = bgAlarms.indexOf(al);
     bgAlarms.splice(index, 1);     //remove from bg array
     chrome.alarms.clear(al.name); //remove from chrome alarms
