@@ -1,5 +1,5 @@
 /* popup.js created for Social Media Stopwatch
-* Updated 3/17/2019
+* Updated 3/21/2019
 * Author: Daniel Martin
 * website: www.dmartin.me
 * Github: github.com/danmartindev

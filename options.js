@@ -1,16 +1,14 @@
+/* options.js created for Social Media Stopwatch
+* Updated 3/21/2019
+* Author: Daniel Martin
+* website: www.dmartin.me
+* Github: github.com/danmartindev
+*/
+
 var urls;
 
 $( document ).ready(function() {
   //get the local saved version of the urls array
-  //var call = "call";
-  //var two = "calling";
-  // var match = call.test(two);
-  // if(two.match(call)){
-  //   console.log("matched");
-  // } else {
-  //   console.log("no match");
-  // };
-  //console.log(match);
   chrome.storage.sync.get(['urls'], function(result){
     console.log(result.urls);
     if(!result.urls){
