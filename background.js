@@ -24,7 +24,8 @@ chrome.runtime.onInstalled.addListener(function() {
         if(changeInfo.status == "complete"){
             console.log("change info: " + changeInfo.status.discarded);
             urls[tabId] = tab.url;
-            compareURLs(tabId);
+            //convert tabId to string to prevent error
+            compareURLs(tabId.toString());
         }
     });
 
