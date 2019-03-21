@@ -2,20 +2,39 @@
 <html>
   <head>
     <style>
-      button {
-        height: 30px;
-        width: 30px;
-        outline: none;
-        margin: 10px;
+      .timeinput{
+        width: 50px;
+        margin-left: 10px;
       }
     </style>
+    <script src="jquery-3.3.1.min.js"></script>
+    <script src="options.js"></script>
   </head>
   <body>
-    <div id="buttonDiv">
-    </div>
     <div>
-      <p>Choose a different background color!</p>
+      <h2>Social Stopwatch Settings</h2>
+      <button id="cBtn">Color</button>
+      <button id="lBtn">Load</button>
+      <button id="clearBtn">Clear</button>
+      <h3>Set Default Alarms</h3>
+      <p>
+        Use the boxes below to set urls which will have alarms generated for them autmatically.
+        For example: type reddit.com in the URL box and 5 in the hours column to have social
+        stopwatch create a timer automatically for any reddit url.
+      </p>
+      <form>
+        <h4>URL: </h4>
+        <input type="text" name="myUrl" id="myUrl">
+        <br>
+        <h4>Time: </h4>
+        <span><input type="text" id="input-h" name="input-h" class = "timeinput">H</span>
+        <span><input type="text" id="input-m" name="input-m" class = "timeinput">M</span>
+        <span><input type="text" id="input-s" name="input-s" class = "timeinput">S</span>
+        <br>
+        <input type="submit" name="default-submit" value="submit">
+      </form>
+      <h2>Set URLs</h2>
+      <ul id="set-urls"></ul>
     </div>
   </body>
-  <script src="options.js"></script>
 </html>
