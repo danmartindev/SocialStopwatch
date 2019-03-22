@@ -1,12 +1,12 @@
 /* background.js created for Social Media Stopwatch
-* Updated 3/21/2019
+* Updated 3/22/2019
 * Author: Daniel Martin
 * website: www.dmartin.me
 * Github: github.com/danmartindev
 */
 
 var urls = { }; //dictionary for storing urls with tab id
-var bgAlarms = []; //array of all alarms
+var bgAlarms = { }; //dictionary of all alarms
 var paused = { }; //dictionary of paused alarms
 var defaultAlarms = { }; //dictionary of alarms created on url creation
 
@@ -36,12 +36,13 @@ chrome.runtime.onInstalled.addListener(function() {
 
     //remove deleted tabs from urls
     chrome.tabs.onRemoved.addListener(function(tabId) { 
-        //delete alarms that match tab when tab is closed
-        bgAlarms.forEach(alarm => {
-            if(alarm.name == tabId){
-                deleteAlarm(alarm);
-            }
-        });
+        //delete alarms/paused that match tab when tab is closed
+        if(bgAlarms[tabId]){
+            deleteAlarm(tabId);
+        }
+        if(paused[tabId]){
+            delete paused[tabId];
+        }
         delete urls[tabId]; //remove from urls list   
     });
 
@@ -101,22 +102,20 @@ chrome.alarms.onAlarm.addListener(function( alarm ){
 
 //listens for change in local storage
 chrome.storage.onChanged.addListener(function(changes, sync){
-    //logging the values for all of urls
     //console.log("change detected: " + JSON.stringify(changes.urls.newValue));
-    for(var url in urls){
-        compareURLs(url);
-    }
+    defaultAlarms = changes.urls.newValue; //update default alarms to newly set values
+    //console.log("D Alarms: " + JSON.stringify(defaultAlarms));
 });
+
+// function checkIsAlarm(id){
+//     if()
+// }
 
 function compareURLs(id){
     //check if alarm already exists
     var exists = false;
-    for(var i = 0; i < bgAlarms.length; i++){
-        console.log("alarms::" + JSON.stringify(bgAlarms));
-        if(bgAlarms[i].name == id){
-            exists = true;
-            console.log("exists");
-        }
+    if(bgAlarms[id]){
+        exists = true;
     }
     //if not
     if(exists == false){
@@ -135,6 +134,7 @@ function compareURLs(id){
 function resumeAlarm(name){
     var seconds = paused[name] / 1000; //get value of time left and convert to seconds
     delete paused[name];
+    console.log(Object.keys(paused).length);
     createAlarm(0, 0, seconds, name); //recreate alarm with 
 };
 
@@ -147,15 +147,13 @@ function createAlarm(h, mm, ss, id){
 
     chrome.alarms.create(id, {when: date.getTime()}); //create the alarm with the name and time
     chrome.alarms.get(id, function(alarm){
-        bgAlarms.push(alarm); //get the alarm and add it to the array
+        bgAlarms[alarm.name] = alarm.scheduledTime; //get the alarm and add it to the array
     });
 }
 
-function deleteAlarm(al){
-    console.log("al: " + al);
-    var index = bgAlarms.indexOf(al);
-    bgAlarms.splice(index, 1);     //remove from bg array
-    chrome.alarms.clear(al.name); //remove from chrome alarms
+function deleteAlarm(alarmName){
+    delete bgAlarms[alarmName];
+    chrome.alarms.clear(alarmName.toString()); //remove from chrome alarms
 }
 
 /*
@@ -164,11 +162,10 @@ function deleteAlarm(al){
 *   not stop the alarm from firing at the original declared time  
 */  
 function pauseAlarm(name, time){
-    chrome.alarms.get(name, function(alarm){
-        deleteAlarm(alarm);
-    });
+    deleteAlarm(name);
     //paused.push({name: name, time: time}); //save time remaining to later reinstate alarm
     paused[name] = time;
+    console.log(Object.keys(paused).length);
     console.log("paused: " + JSON.stringify(paused));
 }
 
