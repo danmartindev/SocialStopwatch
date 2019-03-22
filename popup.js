@@ -1,13 +1,13 @@
 /* popup.js created for Social Media Stopwatch
-* Updated 3/21/2019
+* Updated 3/22/2019
 * Author: Daniel Martin
 * website: www.dmartin.me
 * Github: github.com/danmartindev
 */
 
-var bg;
-var popUrls;
-var popAlarms;
+var bg; //rederence to background.js
+var popUrls; //background.js urls
+var popAlarms; //popAlarms.js urls
 
 //opening port to communicate with background page
 var port = chrome.runtime.connect({name: "timer"});
@@ -20,9 +20,11 @@ $( document ).ready(function() {
   //get the urls and alarms already in bg
   popAlarms = bg.bgAlarms;
   pausedAlarms = bg.paused;
+  console.log("PALARMS: " + JSON.stringify(pausedAlarms));
   popUrls = bg.urls;
 
   updateAlarmList(); //update list, otherwise will wait for first load
+  showPaused(); //update list with inital paused alarms
 
   //port responses
   port.onMessage.addListener(function(msg) {
@@ -38,7 +40,6 @@ $( document ).ready(function() {
   //button to open url list for adding an alarm
   $( "#add-btn" ).click(function(){
     if($('#url-list').is(":hidden")){
-      //popUrls = bg.urls; //re-populate list of urls
       //creates a list of urls for the user to choose from, 
       for(var key in popUrls){
         //tab id(key) is stored in id property for use in alarm creation 
@@ -91,11 +92,7 @@ $( document ).ready(function() {
   $( "#alarm-list" ).on( "click", ".pause-btn",function() {
     console.log("clicked pause");
     var alarmName = $(this).parent().attr('id');  
-    popAlarms.forEach(alarm => {
-      if(alarm.name == alarmName){
-        pauseAlarm(alarm);
-      }
-    });
+    pauseAlarm(alarmName);
     $("#alarm-list").remove($(this).parent().attr('id'));
     $(this).toggleClass("pause-btn resume-btn");
     $(this).toggleClass("fa-pause fa-play");
@@ -111,7 +108,7 @@ $( document ).ready(function() {
   });
 });
 
-//function called to pass info to popup and show popup
+//function called to pass info to and show new-alarm popup
 function showPopup(url, id){
   $( "#newalarm-div" ).slideToggle(400);
   $( "#newalarm-url" ).html(url);
@@ -129,10 +126,10 @@ urlTrunc = function(url) {
 };
 
 //manually pause alarm
-function pauseAlarm(alarm){
+function pauseAlarm(alarmName){
   var now = new Date().getTime();
-  var diff = alarm.scheduledTime - now;
-  port.postMessage({func: "pause", name: alarm.name, addTime: diff}); //post message to pause specific alarm
+  var diff = popAlarms[alarmName] - now;
+  port.postMessage({func: "pause", name: alarmName, addTime: diff}); //post message to pause specific alarm
 }
 
 //manually resume alarm
@@ -141,42 +138,36 @@ function resumeAlarm(alarm){
 }
 
 function updateAlarmList(){
-  updateActiveAlarms(); //active alarms updating
-  updatePausedAlarms(); //paused alarms updating
-}
-
-function updateActiveAlarms(){
    //variables for updates
    var diff;
    var hours;
    var minutes;
    var seconds;
    var now = new Date().getTime();
- 
-   popAlarms.forEach(alarm => {
-     //calculating time for each alarm
-     diff = alarm.scheduledTime - now;
-     hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-     minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-     seconds = Math.floor((diff % (1000 * 60)) / 1000);
-     //update time info, or create new element for new alarm
-     if($("#" + alarm.name).length) {
-       $('#alarm-list').children("#" + alarm.name).children("span").text( urlTrunc(popUrls[alarm.name]) + "  "+ hours + "h, " + minutes + "m, " + seconds);
-     } else {
-       $( "#alarm-list" ).append("<li id='" + alarm.name + "'><span>" + urlTrunc(popUrls[alarm.name]) + "  "+ hours + "h, " + minutes + "m, " + seconds + "s</span><i class='pause-btn fas fa-pause fa-lg'></i></li>");
-     }
-   });
+
+   for(var alarm in popAlarms){
+    diff = popAlarms[alarm]- now;
+    hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    seconds = Math.floor((diff % (1000 * 60)) / 1000);
+    //update time info, or create new element for new alarm
+    if($("#" + alarm).length) {
+      $('#alarm-list').children("#" + alarm).children("span").text( urlTrunc(popUrls[alarm]) + "  "+ hours + "h, " + minutes + "m, " + seconds);
+    } else {
+      $( "#alarm-list" ).append("<li id='" + alarm + "'><span>" + urlTrunc(popUrls[alarm]) + "  "+ hours + "h, " + minutes + "m, " + seconds + "s</span><i class='pause-btn fas fa-pause fa-lg'></i></li>");
+    }
+   }
 }
 
-function updatePausedAlarms(){
-  for(var key in pausedAlarms){
-      $('#alarm-list').children("#" + key).children("span").text(urlTrunc(popUrls[key])); //updating paused alarm info
-  } 
+function showPaused(){
+  for(var alarm in pausedAlarms){
+    $( "#alarm-list" ).append("<li id='" + alarm + "'><span>" + urlTrunc(popUrls[alarm]) + " </span><i class='resume-btn fas fa-play fa-lg'></i></li>");
+  }
 }
 
 //interval timer for displaying time left in alarm
 window.setInterval( function(){
-  if(popAlarms.length > 0){
+  if(Object.keys(popAlarms).length > 0){
     updateAlarmList();
   }
 },1000)
