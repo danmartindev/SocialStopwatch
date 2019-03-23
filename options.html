@@ -1,6 +1,6 @@
 <!-- 
 - options.html created for Social Media Stopwatch
-- Updated 3/21/2019
+- Updated 3/22/2019
 - Author: Daniel Martin
 - website: www.dmartin.me
 - Github: github.com/danmartindev
@@ -10,35 +10,81 @@
 <html>
   <head>
     <style>
+      #options-wrap{
+        width: 700px;
+        margin: auto;
+      }
+
+      h1{
+        text-align: center;
+      }
+
+      p{
+        font-size: 16px;
+      }
+
       .timeinput{
         width: 50px;
         margin-left: 10px;
       }
+      #set-urls{
+        list-style-type: none;
+        max-height: 400px;
+        padding-left: 0px;
+      }
+
+      li{
+        font-size: 16px;
+        padding: 6px 0px 6px 0px;
+      }
+
+      input[type=text], select {
+        width: 60px;
+        padding: 8px 10px;
+        margin: 4px 10px;
+        display: inline-block;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+      }
+
+      #myUrl {
+        width: 200px;
+      }
+
+      i{
+        cursor: pointer;
+        -webkit-transition: .25s;
+        transition: .25s;
+        transition-timing-function: ease-in-out;
+      }
+
+      i:hover{
+        color: red;
+      }
     </style>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
     <script src="jquery-3.3.1.min.js"></script>
     <script src="options.js"></script>
   </head>
   <body>
-    <div>
-      <h2>Social Stopwatch Settings</h2>
-      <button id="cBtn">Color</button>
+    <div id="options-wrap">
+      <h1>Social Stopwatch Options</h1>
+      <!-- <button id="cBtn">Color</button>
       <button id="lBtn">Load</button>
-      <button id="clearBtn">Clear</button>
-      <h3>Set Default Alarms</h3>
+      <button id="clearBtn">Clear</button> -->
+      <h2>Set Default Alarms</h2>
       <p>
         Use the boxes below to set urls which will have alarms generated for them autmatically.
         For example: type reddit.com in the URL box and 5 in the hours column to have social
         stopwatch create a timer automatically for any reddit url.
       </p>
       <form>
-        <h4>URL: </h4>
-        <input type="text" name="myUrl" id="myUrl">
-        <br>
-        <h4>Time: </h4>
-        <span><input type="text" id="input-h" name="input-h" class = "timeinput">H</span>
-        <span><input type="text" id="input-m" name="input-m" class = "timeinput">M</span>
-        <span><input type="text" id="input-s" name="input-s" class = "timeinput">S</span>
-        <br>
+        <h2>New default alarm</h2>
+        <input type="text" name="myUrl" id="myUrl" placeholder="URL here">
+        <span><input type="text" id="input-h" name="input-h" class="timeinput" placeholder="HH">H</span>
+        <span><input type="text" id="input-m" name="input-m" class="timeinput" placeholder="MM">M</span>
+        <span><input type="text" id="input-s" name="input-s" class="timeinput" placeholder="SS">S</span>
         <input type="submit" name="default-submit" value="submit">
       </form>
       <h2>Set URLs</h2>
