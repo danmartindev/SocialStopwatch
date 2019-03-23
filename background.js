@@ -79,7 +79,8 @@ chrome.runtime.onConnect.addListener(function(port) {
                 port.postMessage("message from background");
                 break;
             case "delete":
-                console.log("delete");
+                console.log("delete: " + msg.name);
+                deleteAlarm(msg.name);
                 break;
             case "pause":
                 console.log("pausing: " + JSON.stringify(msg.name));
@@ -106,10 +107,6 @@ chrome.storage.onChanged.addListener(function(changes, sync){
     defaultAlarms = changes.urls.newValue; //update default alarms to newly set values
     //console.log("D Alarms: " + JSON.stringify(defaultAlarms));
 });
-
-// function checkIsAlarm(id){
-//     if()
-// }
 
 function compareURLs(id){
     //check if alarm already exists
