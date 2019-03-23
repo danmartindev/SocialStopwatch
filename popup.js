@@ -44,9 +44,9 @@ $( document ).ready(function() {
       for(var key in popUrls){
         //tab id(key) is stored in id property for use in alarm creation 
         if($("#" + key).length) {
-          $('#url-list').children("#" + key).text(urlTrunc(popUrls[key]));
+          $('#url-list').children("#" + key).text(urlTrunc(popUrls[key], 35));
         } else {
-          $('#url-list').append("<li class='add-li' id = " + key + ">" + urlTrunc(popUrls[key]) + "</li>");
+          $('#url-list').append("<li class='add-li' id = " + key + ">" + urlTrunc(popUrls[key], 35) + "</li>");
         }
       }  
     } 
@@ -101,10 +101,18 @@ $( document ).ready(function() {
   //listener for pause btns in alarm list
   $( "#alarm-list" ).on( "click", ".resume-btn",function() {
     console.log("clicked resume");
-    var alarmName = $(this).parent().attr('id');  
+    var alarmName = $(this).parent().attr('id');   
     resumeAlarm(alarmName);
     $(this).toggleClass("pause-btn resume-btn");
     $(this).toggleClass("fa-pause fa-play");
+  });
+
+  //listener for pause btns in alarm list
+  $( "#alarm-list" ).on( "click", ".delete-btn",function() {
+    var alarmName = $(this).parent().attr('id');  
+    console.log("clicked delete: " + alarmName);
+    deleteAlarm(alarmName);
+    $(this).parent().remove();
   });
 });
 
@@ -116,8 +124,7 @@ function showPopup(url, id){
 }
 
 //function to truncate url length
-urlTrunc = function(url) {
-  var limit = 30;
+urlTrunc = function(url, limit) {
   if(url.length > limit){
     return url.substring(0, limit) + '...';
   } else {
@@ -137,6 +144,11 @@ function resumeAlarm(alarm){
   port.postMessage({func: "resume", name: alarm});
 }
 
+//manually delete alarm
+function deleteAlarm(alarm){
+  port.postMessage({func: "delete", name: alarm});
+}
+
 function updateAlarmList(){
    //variables for updates
    var diff;
@@ -151,17 +163,18 @@ function updateAlarmList(){
     minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
     seconds = Math.floor((diff % (1000 * 60)) / 1000);
     //update time info, or create new element for new alarm
+    console.log("ALARM: " + alarm);
     if($("#" + alarm).length) {
-      $('#alarm-list').children("#" + alarm).children("span").text( urlTrunc(popUrls[alarm]) + "  "+ hours + "h, " + minutes + "m, " + seconds);
+      $('#alarm-list').children("#" + alarm).children(".alarm-url").text( urlTrunc(popUrls[alarm], 25) + "  "+ hours + "h, " + minutes + "m, " + seconds);
     } else {
-      $( "#alarm-list" ).append("<li id='" + alarm + "'><span>" + urlTrunc(popUrls[alarm]) + "  "+ hours + "h, " + minutes + "m, " + seconds + "s</span><i class='pause-btn fas fa-pause fa-lg'></i></li>");
+      $( "#alarm-list" ).append("<li id='" + alarm + "'><span class='alarm-url'>" + urlTrunc(popUrls[alarm], 25) + "  "+ hours + "h, " + minutes + "m, " + seconds + "s</span><i class='delete-btn fas fa-times fa-lg'></i><i class='pause-btn fas fa-pause fa-lg'></i></li>");
     }
    }
 }
 
 function showPaused(){
   for(var alarm in pausedAlarms){
-    $( "#alarm-list" ).append("<li id='" + alarm + "'><span>" + urlTrunc(popUrls[alarm]) + " </span><i class='resume-btn fas fa-play fa-lg'></i></li>");
+    $( "#alarm-list" ).append("<li id='" + alarm + "'><span class='alarm-url'>" + urlTrunc(popUrls[alarm], 25) + " </span><span class='alarm-options'><i class='delete-btn fas fa-times fa-lg'></i><i class='resume-btn fas fa-play fa-lg'></i></span></li>");
   }
 }
 
