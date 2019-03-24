@@ -1,5 +1,5 @@
 /* popup.js created for Social Media Stopwatch
-* Updated 3/22/2019
+* Updated 3/24/2019
 * Author: Daniel Martin
 * website: www.dmartin.me
 * Github: github.com/danmartindev
@@ -20,7 +20,6 @@ $( document ).ready(function() {
   //get the urls and alarms already in bg
   popAlarms = bg.bgAlarms;
   pausedAlarms = bg.paused;
-  console.log("PALARMS: " + JSON.stringify(pausedAlarms));
   popUrls = bg.urls;
 
   updateAlarmList(); //update list, otherwise will wait for first load
@@ -28,8 +27,7 @@ $( document ).ready(function() {
 
   //port responses
   port.onMessage.addListener(function(msg) {
-    //calls alarm list to reduce time lag?????????????????????
-    updateAlarmList();
+    updateAlarmList();  //calls alarm list to show before the next tick of interval timer
   });
 
   //creates the alarm from inputs then hides the add popup
@@ -57,9 +55,12 @@ $( document ).ready(function() {
   //listener for urls in the add timer section
   $( "#url-list" ).on( "click", ".add-li",function() {
     //shows the add timer popup with the url of the desired site
-    showPopup($( this ).text(), $(this).attr('id'));
+    showAlarmPopup($( this ).text(), $(this).attr('id'));
     //removes the url from list of urls 
     $(this).remove();
+    $("#add-btn").toggleClass("fa-minus fa-plus");
+    $("#add-btn").toggle();
+    $('#url-list').slideToggle(200);
   });
 
   //code to submit form for new alarm
@@ -79,48 +80,47 @@ $( document ).ready(function() {
     
     if(!hasNan){
       port.postMessage({func: "create", hours: fields[0].value, minutes: fields[1].value, seconds: fields[2].value, id: fields[3].value}); //post message to background page with alarm info
-      //console.log( $( this ).serializeArray() ); //log the serialized array of values
       event.preventDefault(); //prevents submission if something is wrong
       $( "#newalarm-div" ).slideToggle(400); //hide the div
+      $("#add-btn").slideToggle(400); //show the add btn
     } else {
       alert("Please enter a valid number value for the timer");
     }
     $( this ).trigger("reset"); //reset the form values
   });
 
-  //listener for pause btns in alarm list
-  $( "#alarm-list" ).on( "click", ".pause-btn",function() {
-    console.log("clicked pause");
-    var alarmName = $(this).parent().attr('id');  
-    pauseAlarm(alarmName);
-    $("#alarm-list").remove($(this).parent().attr('id'));
-    $(this).toggleClass("pause-btn resume-btn");
-    $(this).toggleClass("fa-pause fa-play");
+  $("#close-btn").click(function(){
+    $( "#newalarm-div" ).slideToggle(400); //hide the div
+    $("#add-btn").slideToggle(400); //show the add btn
+    $( this ).trigger("reset"); //reset the form values
   });
 
-  //listener for pause btns in alarm list
-  $( "#alarm-list" ).on( "click", ".resume-btn",function() {
-    console.log("clicked resume");
-    var alarmName = $(this).parent().attr('id');   
-    resumeAlarm(alarmName);
-    $(this).toggleClass("pause-btn resume-btn");
-    $(this).toggleClass("fa-pause fa-play");
-  });
-
-  //listener for pause btns in alarm list
-  $( "#alarm-list" ).on( "click", ".delete-btn",function() {
-    var alarmName = $(this).parent().attr('id');  
-    console.log("clicked delete: " + alarmName);
-    deleteAlarm(alarmName);
-    $(this).parent().remove();
+  //listener for alarm options in alarm list
+  $( "#alarm-list" ).on( "click", "i",function() {
+    var alarmName = $(this).parent().attr('id'); //alarm identifier from li id
+    var funcName; //name of function for background.js to run
+    if($(this).hasClass("delete-btn")){
+      funcName = "delete";
+      $(this).parent().remove();
+    } else if($(this).hasClass("pause-btn")){
+      funcName = "pause";
+      $("#alarm-list").remove($(this).parent().attr('id'));
+      $(this).toggleClass("pause-btn resume-btn");
+      $(this).toggleClass("fa-pause fa-play");
+    } else {
+      funcName = "resume";
+      $(this).toggleClass("pause-btn resume-btn");
+      $(this).toggleClass("fa-pause fa-play");
+    }
+    alarmOptionHandler(alarmName, funcName);
   });
 });
 
-//function called to pass info to and show new-alarm popup
-function showPopup(url, id){
-  $( "#newalarm-div" ).slideToggle(400);
-  $( "#newalarm-url" ).html(url);
-  $( "#input-id" ).val(id);
+//shows alarms that are paused as the popup opens
+function showPaused(){
+  for(var alarm in pausedAlarms){
+    $( "#alarm-list" ).append("<li id='" + alarm + "'><span class='alarm-url'>" + urlTrunc(popUrls[alarm], 25) + " </span><i class='resume-btn soc-btn fas fa-play fa-lg'></i><i class='delete-btn soc-btn fas fa-times fa-lg'></i></li>");
+  }
 }
 
 //function to truncate url length
@@ -132,21 +132,21 @@ urlTrunc = function(url, limit) {
   }
 };
 
-//manually pause alarm
-function pauseAlarm(alarmName){
-  var now = new Date().getTime();
-  var diff = popAlarms[alarmName] - now;
-  port.postMessage({func: "pause", name: alarmName, addTime: diff}); //post message to pause specific alarm
+//function called to pass info to and show new-alarm popup
+function showAlarmPopup(url, id){
+  $( "#newalarm-div" ).slideToggle(400);
+  $( "#newalarm-url" ).html(url);
+  $( "#input-id" ).val(id);
 }
 
-//manually resume alarm
-function resumeAlarm(alarm){
-  port.postMessage({func: "resume", name: alarm});
-}
-
-//manually delete alarm
-function deleteAlarm(alarm){
-  port.postMessage({func: "delete", name: alarm});
+//alarm options handled here
+function alarmOptionHandler(alarmName, func){
+  var diff = 0;
+  if(func == "pause"){
+    var now = new Date().getTime();
+    diff = popAlarms[alarmName] - now;
+  }
+  port.postMessage({func: func, name: alarmName, addTime: diff});
 }
 
 function updateAlarmList(){
@@ -163,19 +163,12 @@ function updateAlarmList(){
     minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
     seconds = Math.floor((diff % (1000 * 60)) / 1000);
     //update time info, or create new element for new alarm
-    console.log("ALARM: " + alarm);
     if($("#" + alarm).length) {
       $('#alarm-list').children("#" + alarm).children(".alarm-url").text( urlTrunc(popUrls[alarm], 25) + "  "+ hours + "h, " + minutes + "m, " + seconds);
     } else {
-      $( "#alarm-list" ).append("<li id='" + alarm + "'><span class='alarm-url'>" + urlTrunc(popUrls[alarm], 25) + "  "+ hours + "h, " + minutes + "m, " + seconds + "s</span><i class='delete-btn fas fa-times fa-lg'></i><i class='pause-btn fas fa-pause fa-lg'></i></li>");
+      $( "#alarm-list" ).append("<li id='" + alarm + "'><span class='alarm-url'>" + urlTrunc(popUrls[alarm], 25) + "  "+ hours + "h, " + minutes + "m, " + seconds + "s</span><i class='pause-btn soc-btn fas fa-pause fa-lg'></i><i class='delete-btn soc-btn fas fa-times fa-lg'></i></li>");
     }
    }
-}
-
-function showPaused(){
-  for(var alarm in pausedAlarms){
-    $( "#alarm-list" ).append("<li id='" + alarm + "'><span class='alarm-url'>" + urlTrunc(popUrls[alarm], 25) + " </span><span class='alarm-options'><i class='delete-btn fas fa-times fa-lg'></i><i class='resume-btn fas fa-play fa-lg'></i></span></li>");
-  }
 }
 
 //interval timer for displaying time left in alarm
