@@ -1,6 +1,6 @@
 <!-- 
 -  popup.html created for Social Media Stopwatch
-- Updated 3/22/2019
+- Updated 3/24/2019
 - Author: Daniel Martin
 - website: www.dmartin.me
 - Github: github.com/danmartindev
@@ -14,8 +14,12 @@
         padding: 15px;
       }
 
+      h3, h4 {
+        color: #844DC7;
+      }
+
       #header{
-        font-size: 18px;
+        font-size: 20px;
         text-align: center;
         padding-top: 10px;
       }
@@ -33,22 +37,13 @@
         max-height: 400px;
       }
 
-      
-      .add-container{
-        /* text-align: center; */
-      }
-
       #add-btn{
         font-size: 24px;
         padding: 8px;
         border-radius: 50%;
-        -webkit-transition: background-color .5s; /* For Safari 3.1 to 6.0 */
-        transition: background-color  .25s;
+        -webkit-transition: .25s; /* For Safari 3.1 to 6.0 */
+        transition: .25s;
         transition-timing-function: ease-in-out;
-      }
-
-      #add-btn:hover{
-        background-color: lightgray;
       }
 
       #url-list{
@@ -67,7 +62,6 @@
         text-align: center;
       }
 
-
       .add-li{
         display: inline-block;
         padding: 5px;
@@ -75,21 +69,29 @@
         margin-right: 20px;
         cursor: pointer;
         margin-bottom: 10px;
-        -webkit-transition: background-color .5s;
+        -webkit-transition: background-color .25s;
         transition: background-color  .25s;
         transition-timing-function: ease-in-out;
       }
 
       .add-li:hover{
-        background-color: lightgray;
+        background-color: #AD8FD0;
       }
 
       .alarm-options {
         float: right;
       }
 
-      i{
+      .soc-btn{
         cursor: pointer;
+        color: #AD8FD0;
+        -webkit-transition: .25s;
+        transition: .25s;
+        transition-timing-function: ease-in-out;
+      }
+
+      .soc-btn:hover{
+        color: #7846B2;
       }
 
       .pause-btn, .resume-btn, .delete-btn{
@@ -100,22 +102,49 @@
         transition-timing-function: ease-in-out;
       }
 
-      .pause-btn:hover{
-        background-color: lightgray;
-      } 
-      
-      .resume-btn:hover{
-        background-color: lightgray;
-      }
-
       .delete-btn:hover{
         color: red;
       }
 
-
-      input{
-        width: 50px;
+      input[type=text], select {
+        width: 60px;
+        padding: 6px 10px;
+        margin: 0px 2px 5px 10px;
+        display: inline-block;
+        border: 1px solid #AD8FD0;
+        border-radius: 4px;
+        box-sizing: border-box;
       }
+
+      input[type=text]:focus {
+        outline: 1px solid #7846B2;        
+      }
+
+      input[type=submit] {
+        margin-left: 5px;
+        margin-right: 8px;
+        padding:6px 15px; 
+        background:#AD8FD0; 
+        border:0 none;
+        cursor:pointer;
+        -webkit-border-radius: 5px;
+        border-radius: 5px; 
+        transition: .25s;
+        transition-timing-function: ease-in-out;
+      }
+
+      input[type=submit]:hover {
+        background:#7846B2;     
+      }
+
+      input[type=submit]:focus {
+        outline: none;
+      }
+      
+      form {
+        margin-top: 12px;
+      }
+
     </style>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
@@ -133,21 +162,21 @@
         <span id="newalarm-url"></span>
         <br>
         <form>
-          <span><input type="text" id="input-h" name="input-h">H</span>
-          <span><input type="text" id="input-m" name="input-m">M</span>
-          <span><input type="text" id="input-s" name="input-s">S</span>
+          <span>H<input type="text" id="input-h" name="input-h" placeholder="H"></span>
+          <span>M<input type="text" id="input-m" name="input-m" placeholder="M"></span>
+          <span>S<input type="text" id="input-s" name="input-s" placeholder="S"></span>
           <input type="hidden" id="input-id" name="input-id">
-          <input type="submit" name="newalarm-submit" value="submit">
+          <input type="submit" name="newalarm-submit" value="Add">
+          <i class="soc-btn fas fa-times fa-lg" id="close-btn"></i>
         </form>
       </div>
-      <!-- button to open dropdown which shows a list of urls for alarms -->
-      <!-- <button id="add-btn"><i class = "fas fa-plus"></i></button> -->
-      
+      <!-- list of current urls -->
       <ul id="url-list">
         <h4 id="url-header">Add Alarm</h4>
       </ul>
+      <!-- button to open url-list -->
       <div class="add-container">
-        <i class="fas fa-plus" id="add-btn"></i>
+        <i class="soc-btn fas fa-plus" id="add-btn"></i>
       </div>
     </div>
   </body>
