@@ -94,7 +94,11 @@ chrome.runtime.onConnect.addListener(function(port) {
 //function for alarm trigger
 chrome.alarms.onAlarm.addListener(function( alarm ){
     //console.log("Alarm: " + alarm.name);
-    alert("Times Up!"); 
+    chrome.tabs.get(parseInt(alarm.name), function(tab) {
+        chrome.tabs.highlight({'tabs': tab.index}, function() {
+            alert("Time's up for "+ urls[alarm.name] +" !"); 
+        });
+    });
     deleteAlarm(alarm.name);
 });
 
