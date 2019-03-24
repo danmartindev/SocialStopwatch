@@ -1,6 +1,6 @@
 <!-- 
 - options.html created for Social Media Stopwatch
-- Updated 3/22/2019
+- Updated 3/23/2019
 - Author: Daniel Martin
 - website: www.dmartin.me
 - Github: github.com/danmartindev
@@ -19,8 +19,20 @@
         text-align: center;
       }
 
+      h1, h2{
+        color: #7846B2;
+      }
+
+      h2{
+        margin: 30px 0px 10px 0px;
+      }
+
       p{
         font-size: 16px;
+      }
+
+      span{
+        margin: 4px 10px 4px 0px;
       }
 
       .timeinput{
@@ -39,13 +51,39 @@
       }
 
       input[type=text], select {
+        margin-right: 4px;
         width: 60px;
         padding: 8px 10px;
-        margin: 4px 10px;
         display: inline-block;
-        border: 1px solid #ccc;
+        border: 1px solid #AD8FD0;
         border-radius: 4px;
         box-sizing: border-box;
+      }
+
+      input[type=text]:focus {
+        outline: 1px solid #7846B2;        
+      }
+
+      input[type=submit] {
+        font-size: 16px;
+        margin-left: 5px;
+        margin-right: 8px;
+        padding: 7px 15px; 
+        background:#AD8FD0; 
+        border:0 none;
+        cursor:pointer;
+        -webkit-border-radius: 5px;
+        border-radius: 5px; 
+        transition: .25s;
+        transition-timing-function: ease-in-out;
+      }
+
+      input[type=submit]:hover {
+        background:#7846B2;     
+      }
+
+      input[type=submit]:focus {
+        outline: none;
       }
 
       #myUrl {
@@ -54,6 +92,7 @@
 
       i{
         cursor: pointer;
+        color: #AD8FD0;
         -webkit-transition: .25s;
         transition: .25s;
         transition-timing-function: ease-in-out;
@@ -62,6 +101,11 @@
       i:hover{
         color: red;
       }
+
+      form{
+        margin-bottom: 10px;
+      }
+
     </style>
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
     <script src="jquery-3.3.1.min.js"></script>
@@ -70,14 +114,15 @@
   <body>
     <div id="options-wrap">
       <h1>Social Stopwatch Options</h1>
-      <!-- <button id="cBtn">Color</button>
-      <button id="lBtn">Load</button>
-      <button id="clearBtn">Clear</button> -->
+      <!-- <button id="clearBtn">Clear</button> -->
       <h2>Set Default Alarms</h2>
       <p>
-        Use the boxes below to set urls which will have alarms generated for them autmatically.
-        For example: type reddit.com in the URL box and 5 in the hours column to have social
-        stopwatch create a timer automatically for any reddit url.
+        Use the inputs below to set Default Alarms. Default Alarms will automatically create an alarm
+        using the time you input whenever you navigate to a url that contains what you typed.
+        <br>
+        For example: typing reddit.com in the URL box, then setting H to 1, M to 20, and S to 0,
+        will make Social Stopwatch create an alarm that's 1hr and 20min long for every tab that goes to a website with reddit.com 
+        in the URL.
       </p>
       <form>
         <h2>New default alarm</h2>
@@ -85,7 +130,7 @@
         <span><input type="text" id="input-h" name="input-h" class="timeinput" placeholder="HH">H</span>
         <span><input type="text" id="input-m" name="input-m" class="timeinput" placeholder="MM">M</span>
         <span><input type="text" id="input-s" name="input-s" class="timeinput" placeholder="SS">S</span>
-        <input type="submit" name="default-submit" value="submit">
+        <input type="submit" name="default-submit" value="Add">
       </form>
       <h2>Set URLs</h2>
       <ul id="set-urls"></ul>
