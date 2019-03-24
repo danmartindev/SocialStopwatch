@@ -46,7 +46,7 @@ $( document ).ready(function() {
 
     var totalTime = fields[1].value + fields[2].value + fields[3].value;
 
-    if(!hasNan && totalTime > 0 && fields[0].value != ""){
+    if(!hasNan && totalTime > 0){
       urls[fields[0].value] = [fields[1].value, fields[2].value, fields[3].value];
       chrome.storage.sync.set({'urls': urls}, function(){
         //console.log("Set urls");
