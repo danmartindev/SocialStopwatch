@@ -1,6 +1,6 @@
 {
     "name": "Social Media Stopwatch",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "Timer for how long you spend on Social Media",
     "permissions": ["tabs", "activeTab", "storage", "alarms"],
     "options_page": "options.html",
